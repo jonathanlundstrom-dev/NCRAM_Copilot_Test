@@ -1,438 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>NC-RAM Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<script>Chart.register(ChartDataLabels);</script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8f8f6;color:#1a1a18;font-size:14px}
-.dash{padding:20px;max-width:1100px;margin:0 auto}
-.topbar{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
-.topbar h1{font-size:18px;font-weight:600;color:#1a1a18}
-.topbar p{font-size:12px;color:#73726c;margin-top:3px}
-.filters{display:flex;gap:8px;flex-wrap:wrap}
-select{font-size:12px;padding:6px 10px;border:1px solid #d3d1c7;border-radius:8px;background:#fff;color:#1a1a18;cursor:pointer;outline:none}
-.tabs{display:flex;gap:2px;margin-bottom:18px;border-bottom:1px solid #d3d1c7;overflow-x:auto}
-.tab{font-size:13px;padding:9px 16px;cursor:pointer;color:#73726c;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:400;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;transition:color .15s}
-.tab.active{color:#1a1a18;border-bottom-color:#1a1a18;font-weight:600}
-.tab.ftab.active{color:#1D9E75;border-bottom-color:#1D9E75}
-.tab:hover{color:#1a1a18}
-.section{display:none}.section.active{display:block}
-.mrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
-.mc{background:#fff;border:1px solid #e8e6df;border-radius:10px;padding:14px 16px}
-.mc.gr{border-color:#9FE1CB;background:#f4fdf9}
-.mc .lb{font-size:10px;color:#888780;margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;font-weight:500}
-.mc .vl{font-size:24px;font-weight:600;color:#1a1a18}
-.mc .sb{font-size:11px;margin-top:4px}
-.pos{color:#1D9E75}.neg{color:#E24B4A}.neu{color:#73726c}
-.card{background:#fff;border:1px solid #e8e6df;border-radius:12px;padding:16px 18px;margin-bottom:14px}
-.card.gr{border-color:#9FE1CB}
-.ct{font-size:13px;font-weight:600;color:#1a1a18;margin-bottom:14px}
-.twoc{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{font-size:10px;font-weight:600;color:#888780;text-align:left;padding:6px 8px;border-bottom:1px solid #e8e6df;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
-th.r{text-align:right}
-td{padding:7px 8px;border-bottom:1px solid #f1efe8;color:#1a1a18;vertical-align:middle}
-td.r{text-align:right}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:#fafaf8}
-.rn{font-size:11px;color:#888780;font-weight:600}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
-.bG{background:#EAF3DE;color:#2d6b0e}
-.bR{background:#FCEBEB;color:#8c2020}
-.bN{background:#f1efe8;color:#5f5e5a}
-.bI{background:#e6f1fb;color:#0c447c}
-.bF{background:#E1F5EE;color:#0F6E56}
-.cw{position:relative;height:220px;width:100%}
-.cw2{position:relative;height:260px;width:100%}
-.cw3{position:relative;height:300px;width:100%}
-.sbtn{font-size:11px;padding:5px 12px;border:1px solid #d3d1c7;border-radius:20px;cursor:pointer;background:#fff;color:#73726c;font-weight:500;transition:all .15s}
-.sbtn.on{background:#1a1a18;color:#fff;border-color:#1a1a18}
-.sbtn.fit.on{background:#1D9E75;border-color:#1D9E75}
-.sbtn:hover:not(.on){background:#f8f8f6}
-.snav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;flex-shrink:0}
-.whdr{background:#f4fdf9;border:1px solid #9FE1CB;border-radius:12px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.wico{width:44px;height:44px;border-radius:50%;background:#1D9E75;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:20px}
-.wttl{font-size:16px;font-weight:700;color:#085041}
-.wsub{font-size:12px;color:#0F6E56;margin-top:3px}
-.wsts{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap}
-.wst .wv{font-size:22px;font-weight:700;color:#085041;text-align:center}
-.wst .wl{font-size:10px;color:#0F6E56;text-transform:uppercase;letter-spacing:.05em;font-weight:500;text-align:center}
-.pbar{height:8px;background:#e8e6df;border-radius:4px;overflow:hidden;margin-top:4px}
-.pfil{height:100%;border-radius:4px}
-.phdr{display:flex;align-items:center;gap:16px;padding:18px;background:#fff;border:1px solid #e8e6df;border-radius:12px;margin-bottom:14px;flex-wrap:wrap}
-.ava{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
-.kgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
-.km{background:#fff;border:1px solid #e8e6df;border-radius:10px;padding:12px;text-align:center}
-.km .kv{font-size:22px;font-weight:600;color:#1a1a18}
-.km .kl{font-size:10px;color:#888780;text-transform:uppercase;letter-spacing:.05em;margin-top:3px;font-weight:500}
+  <meta charset="UTF-8" />
+  <title>Regional Non-Commercial Performance Dashboard YTD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.jsscript>
+  <style>
+    :root{
+      --bg:#f7f7f8;
+      --panel:#ffffff;
+      --line:#e5e7eb;
+      --text:#111827;
+      --muted:#6b7280;
+      --accent:#5567c9;
+      --good:#0f8b6d;
+      --bad:#c2413a;
+      --flat:#b7791f;
+      --shadow:0 6px 18px rgba(17,24,39,.05);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Segoe UI, Inter, Arial, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1480px;
+      margin:0 auto;
+      padding:18px 18px 30px;
+    }
+    h1{
+      margin:0 0 14px;
+      font-size:28px;
+      font-weight:800;
+      line-height:1.1;
+    }
+    .error-banner{
+      display:none;
+      margin:0 0 12px;
+      padding:12px 14px;
+      border:1px solid #fecaca;
+      background:#fff1f2;
+      color:#9f1239;
+      border-radius:12px;
+      font-size:13px;
+      white-space:pre-wrap;
+    }
+    .tabs{
+      display:flex;
+      gap:8px;
+      border-bottom:1px solid var(--line);
+      margin-bottom:14px;
+      overflow:auto;
+    }
+    .tab{
+      background:none;
+      border:none;
+      padding:12px 14px;
+      cursor:pointer;
+      color:var(--muted);
+      font-weight:700;
+      border-bottom:2px solid transparent;
+      white-space:nowrap;
+    }
+    .tab.active{
+      color:var(--text);
+      border-bottom-color:var(--accent);
+    }
+    .section{display:none}
+    .section.active{display:block}
 
-.tab.itab.active{color:#534AB7;border-bottom-color:#534AB7}
-.icard{background:#fff;border:1px solid #e8e6df;border-radius:12px;padding:20px;margin-bottom:12px}
-.icard .ihead{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
-.icard .inum{width:28px;height:28px;border-radius:50%;background:#534AB7;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.icard .ititle{font-size:13px;font-weight:600;color:#1a1a18;margin-bottom:3px}
-.icard .ibody{font-size:12px;color:#3d3d3a;line-height:1.65}
-.icard .itag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;margin-top:8px}
-.icard.pos-card{border-left:3px solid #1D9E75}
-.icard.neg-card{border-left:3px solid #E24B4A}
-.icard.neu-card{border-left:3px solid #EF9F27}
-.icard.info-card{border-left:3px solid #378ADD}
-.itag.pos{background:#EAF3DE;color:#2d6b0e}
-.itag.neg{background:#FCEBEB;color:#8c2020}
-.itag.neu{background:#FAEEDA;color:#854F0B}
-.itag.info{background:#e6f1fb;color:#0c447c}
-.ibtn{font-size:12px;padding:8px 18px;border:1px solid #534AB7;border-radius:8px;cursor:pointer;background:#534AB7;color:#fff;font-weight:500}
-.ibtn:hover{background:#3C3489}
-.ibtn:disabled{background:#d3d1c7;border-color:#d3d1c7;cursor:not-allowed}
-.isel{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.isel-btn{font-size:11px;padding:5px 12px;border:1px solid #d3d1c7;border-radius:20px;cursor:pointer;background:#fff;color:#73726c;font-weight:500}
-.isel-btn.on{background:#534AB7;color:#fff;border-color:#534AB7}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid #d3d1c7;border-top-color:#534AB7;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.anote{font-size:11px;color:#888780;margin-top:12px;padding:10px 12px;background:#f8f8f6;border-radius:8px;border:1px solid #e8e6df}
-.tab.awtab.active{color:#EF9F27;border-bottom-color:#EF9F27}
-.awhdr{background:#faeeda;border:1px solid #EF9F27;border-radius:12px;padding:18px 20px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.awico{width:44px;height:44px;border-radius:50%;background:#EF9F27;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:20px}
-.awttl{font-size:16px;font-weight:700;color:#412402}
-.awsub{font-size:12px;color:#633806;margin-top:3px}
-.awsts{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap}
-.awst .awv{font-size:22px;font-weight:700;color:#412402;text-align:center}
-.awst .awl{font-size:10px;color:#633806;text-transform:uppercase;letter-spacing:.05em;font-weight:500;text-align:center}
-.sbtn.aw.on{background:#EF9F27;border-color:#EF9F27}
-.card.aw{border-color:#EF9F27}
-.mc.aw{border-color:#EF9F27;background:#fdf6e9}
-.mper{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.mper label{font-size:11px;font-weight:500;color:#73726c}
-.mper select{font-size:11px;padding:5px 8px;border:1px solid #d3d1c7;border-radius:8px;background:#fff}
-@media(max-width:640px){.mrow{grid-template-columns:1fr 1fr}.twoc{grid-template-columns:1fr}.kgrid{grid-template-columns:1fr 1fr}.wsts{margin-left:0}}
-.fbar{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end}
-.fbgroup{display:flex;flex-direction:column;gap:3px}
-.fblabel{font-size:10px;font-weight:600;color:#888780;text-transform:uppercase;letter-spacing:.05em}
-.mchk-wrap{position:relative;display:inline-block}
-.mchk-btn{font-size:12px;padding:6px 12px;border:1px solid #d3d1c7;border-radius:8px;background:#fff;color:#1a1a18;cursor:pointer;min-width:140px;text-align:left;white-space:nowrap}
-.mchk-btn:after{content:'\25BE';float:right;margin-left:8px;color:#73726c}
-.mchk-drop{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:300;background:#fff;border:1px solid #d3d1c7;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:190px;padding:6px 0}
-.mchk-drop.open{display:block}
-.mchk-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:#1a1a18;user-select:none}
-.mchk-item:hover{background:#f8f8f6}
-.mchk-item input[type=checkbox],.mchk-item input[type=radio]{accent-color:#534AB7;width:14px;height:14px;flex-shrink:0;cursor:pointer}
-</style>
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .control{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      box-shadow:var(--shadow);
+    }
+    .control label{
+      display:block;
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:800;
+      margin-bottom:8px;
+    }
+    .control select{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      font-size:14px;
+      color:var(--text);
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:10px;
+      margin-bottom:14px;
+    }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+    }
+    .metric{
+      padding:15px 16px;
+    }
+    .metric .label{
+      font-size:11px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-weight:800;
+    }
+    .metric .value{
+      margin-top:10px;
+      font-size:28px;
+      font-weight:800;
+      line-height:1;
+    }
+    .metric .sub{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:1.15fr .95fr;
+      gap:14px;
+      margin-bottom:14px;
+    }
+    .two{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+    .panel{
+      padding:14px 14px 12px;
+    }
+    .panel h2{
+      margin:0;
+      font-size:16px;
+    }
+    .subtle{
+      color:var(--muted);
+      font-size:12px;
+      margin:6px 0 10px;
+    }
+    .canvas-lg{position:relative;height:340px}
+    .canvas-sm{position:relative;height:255px}
+
+    .table-wrap{
+      overflow:auto;
+      border-top:1px solid var(--line);
+      margin-top:10px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    th,td{
+      padding:9px 10px;
+      border-bottom:1px solid #edf2f7;
+      white-space:nowrap;
+      text-align:left;
+    }
+    th{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+      background:#fafbfc;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
+    tr:hover td{background:#fafbff}
+    .td-r, th.td-r{text-align:right}
+    .rank{font-weight:800}
+    .name{font-weight:700}
+    .region-pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:700;
+      color:#fff;
+    }
+    .Central{background:#6c94d9}
+    .Midwest{background:#67b79e}
+    .Northeast{background:#d1a55c}
+    .Southeast{background:#d77f77}
+    .West{background:#9a90de}
+    .trend-up{color:var(--good);font-weight:900}
+    .trend-down{color:var(--bad);font-weight:900}
+    .trend-flat{color:var(--flat);font-weight:900}
+    .trend-new{color:#94a3b8;font-weight:900}
+
+    .profile-grid{
+      display:grid;
+      grid-template-columns:repeat(6,minmax(0,1fr));
+      gap:8px;
+    }
+    .mini{
+      background:#fbfbfc;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      text-align:center;
+    }
+    .mini .k{
+      font-size:10px;
+      color:var(--muted);
+      text-transform:uppercase;
+      font-weight:800;
+      letter-spacing:.05em;
+    }
+    .mini .v{
+      margin-top:6px;
+      font-size:20px;
+      font-weight:800;
+    }
+    .footer{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
+    @media (max-width:1180px){
+      .controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .layout,.two{grid-template-columns:1fr}
+      .profile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    }
+    @media (max-width:760px){
+      .controls{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr 1fr}
+      .profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      h1{font-size:24px}
+    }
+  </style>
 </head>
 <body>
-<div class="dash">
+<div class="wrap">
+  <h1>Regional Non-Commercial Performance Dashboard<br>YTD</h1>
 
-<div class="topbar">
-  <div>
-    <h1>Regional Non-Commercial Performance Dashboard</h1>
-    <p>Regional Non-Commercial Key Account Team | Jan-Mar 2026 | 12 NCRAMs</p>
+  <div id="errorBanner" class="error-banner"></div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="scorecard">Monthly Performance Scorecard</button>
+    <button class="tab" data-tab="volume">Volume Summary</button>
+    <button class="tab" data-tab="focus">Focus Wave Rollup</button>
   </div>
-  <div class="filters"></div>
-</div>
 
-<div class="tabs">
-  <button class="tab active" onclick="goTab('national',this)">National Overview</button>
-  <button class="tab" onclick="goTab('kpi',this)">KPI Scorecard</button>
-  <button class="tab" onclick="goTab('volume',this)">Volume Performance</button>
-  <button class="tab" onclick="goTab('ncram',this)">NCRAM Rankings</button>
-  <button class="tab" onclick="goTab('profile',this)">Individual Profile</button>
-  <button class="tab ftab" onclick="goTab('fitness',this)">Focus Wave - Fitness</button>
-  <button class="tab awtab" onclick="goTab('atwork',this)">Focus Wave - At Work</button>
-  <button class="tab itab" onclick="goTab('insights',this)">AI Insights</button>
-</div>
+  <section id="scorecard" class="section active">
+    <div class="controls">
+      <div class="control"><label>Scorecard Period</label><select id="scorePeriod"></select></div>
+      <div class="control"><label>Region</label><select id="scoreRegion"></select></div>
+      <div class="control"><label>NCRAM</label><select id="scoreName"></select></div>
+      <div class="control"><label>Win Log Owner</label><select id="winOwner"></select></div>
+    </div>
 
-<!-- NATIONAL -->
-<div id="national" class="section active">
-  <div class="fbar">
-    <div class="fbgroup">
-      <span class="fblabel">Month</span>
-      <div class="mchk-wrap" id="natMoWrap">
-        <button class="mchk-btn" id="natMoBtn" onclick="toggleDrop('natMoWrap',event)">All Months</button>
-        <div class="mchk-drop" id="natMoDrop">
-          <label class="mchk-item"><input type="checkbox" class="nat-mo" value="jan" checked onchange="natChanged()"><span>January</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-mo" value="feb" checked onchange="natChanged()"><span>February</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-mo" value="mar" checked onchange="natChanged()"><span>March</span></label>
-        </div>
+    <div class="cards" id="scoreMetrics"></div>
+
+    <div class="layout">
+      <div class="card panel">
+        <h2>KPI Scorecard Rankings</h2>
+        <div class="subtle">Lower score = better performance</div>
+        <div class="canvas-lg"><canvas id="scoreChart"></canvas></div>
+      </div>
+      <div class="card panel">
+        <h2>NCRAM Snapshot</h2>
+        <div class="subtle" id="profileMeta"></div>
+        <div class="profile-grid" id="profileGrid"></div>
+        <div class="canvas-sm" style="margin-top:12px"><canvas id="profileChart"></canvas></div>
       </div>
     </div>
-    <div class="fbgroup">
-      <span class="fblabel">Region</span>
-      <div class="mchk-wrap" id="natRegWrap">
-        <button class="mchk-btn" id="natRegBtn" onclick="toggleDrop('natRegWrap',event)">All Regions</button>
-        <div class="mchk-drop" id="natRegDrop">
-          <label class="mchk-item"><input type="checkbox" class="nat-reg" value="Central" checked onchange="natChanged()"><span>Central</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-reg" value="Midwest" checked onchange="natChanged()"><span>Midwest</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-reg" value="Northeast" checked onchange="natChanged()"><span>Northeast</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-reg" value="Southeast" checked onchange="natChanged()"><span>Southeast</span></label>
-          <label class="mchk-item"><input type="checkbox" class="nat-reg" value="West" checked onchange="natChanged()"><span>West</span></label>
-        </div>
+
+    <div class="card panel">
+      <h2>KPI Breakdown by NCRAM</h2>
+      <div class="table-wrap"><table id="scoreTable"></table></div>
+    </div>
+
+    <div class="two" style="margin-top:14px">
+      <div class="card panel">
+        <h2>Win Log</h2>
+        <div class="table-wrap"><table id="winTable"></table></div>
+      </div>
+      <div class="card panel">
+        <h2>Score Distribution</h2>
+        <div class="canvas-sm"><canvas id="distChart"></canvas></div>
       </div>
     </div>
-    <div class="fbgroup">
-      <span class="fblabel">Segment</span>
-      <div class="mchk-wrap" id="natSegWrap">
-        <button class="mchk-btn" id="natSegBtn" onclick="toggleDrop('natSegWrap',event)" style="min-width:110px">All Segments</button>
-        <div class="mchk-drop" id="natSegDrop">
-          <label class="mchk-item"><input type="radio" name="natSeg" value="all" checked onchange="natChanged()"><span>All Segments</span></label>
-          <label class="mchk-item"><input type="radio" name="natSeg" value="Big3" onchange="natChanged()"><span>Big 3</span></label>
-          <label class="mchk-item"><input type="radio" name="natSeg" value="Vend" onchange="natChanged()"><span>Vending</span></label>
-          <label class="mchk-item"><input type="radio" name="natSeg" value="CU" onchange="natChanged()"><span>C&amp;U</span></label>
-          <label class="mchk-item"><input type="radio" name="natSeg" value="Trvl" onchange="natChanged()"><span>Travel</span></label>
-        </div>
+  </section>
+
+  <section id="volume" class="section">
+    <div class="controls">
+      <div class="control"><label>Month</label><select id="volMonth"></select></div>
+      <div class="control"><label>Region</label><select id="volRegion"></select></div>
+      <div class="control"><label>Segment</label><select id="volSegment"></select></div>
+      <div class="control"><label>NCRAM</label><select id="volName"></select></div>
+    </div>
+
+    <div class="cards" id="volumeMetrics"></div>
+
+    <div class="layout">
+      <div class="card panel">
+        <h2>Region Performance by Segment</h2>
+        <div class="subtle">YTD vs Business Plan</div>
+        <div class="canvas-lg"><canvas id="regionVolChart"></canvas></div>
+      </div>
+      <div class="card panel">
+        <h2>Segment Progress</h2>
+        <div class="subtle">Goal progress by segment</div>
+        <div class="canvas-sm"><canvas id="segmentChart"></canvas></div>
+        <div class="table-wrap"><table id="segmentTable"></table></div>
       </div>
     </div>
-  </div>
-  <div class="mrow" id="NM"></div>
-  <div class="card"><div class="ct" id="natChartTitle">Volume vs Prior Year by Region</div><div style="position:relative;height:300px;width:100%"><canvas id="NSC"></canvas></div></div>
-  <div class="card"><div class="ct">Region Performance Summary</div><table id="NRT"></table></div>
-</div>
 
-<!-- KPI -->
-<div id="kpi" class="section">
-  <div class="fbar">
-    <div class="fbgroup">
-      <span class="fblabel">Month</span>
-      <div class="mchk-wrap" id="kpiMoWrap">
-        <button class="mchk-btn" id="kpiMoBtn" onclick="toggleDrop('kpiMoWrap',event)">Jan + Feb</button>
-        <div class="mchk-drop" id="kpiMoDrop">
-          <label class="mchk-item"><input type="checkbox" class="kpi-mo" value="jan" checked onchange="kpiChanged()"><span>January</span></label>
-          <label class="mchk-item"><input type="checkbox" class="kpi-mo" value="feb" checked onchange="kpiChanged()"><span>February</span></label>
-          <label class="mchk-item"><input type="checkbox" class="kpi-mo" value="mar" onchange="kpiChanged()"><span>March</span></label>
-        </div>
+    <div class="card panel">
+      <h2>NCRAM Volume Detail</h2>
+      <div class="table-wrap"><table id="volTable"></table></div>
+    </div>
+  </section>
+
+  <section id="focus" class="section">
+    <div class="controls">
+      <div class="control"><label>Focus Wave</label><select id="focusType"></select></div>
+      <div class="control"><label>Region</label><select id="focusRegion"></select></div>
+      <div class="control"><label>Owner</label><select id="focusOwner"></select></div>
+      <div class="control"><label>Sort By</label>
+        <select id="focusSort">
+          <option value="reach">Reach</option>
+          <option value="equipmentQty">Equipment</option>
+          <option value="activations">Activations</option>
+        </select>
       </div>
     </div>
-  </div>
-  <div class="mrow" id="KM" style="grid-template-columns:repeat(5,minmax(0,1fr))"></div>
-  <div class="card">
-    <div class="ct">KPI Scorecard Rankings</div>
-    <table id="KRT"></table>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <div class="ct">KPI Activity by NCRAM</div>
-    <div style="position:relative;height:420px;width:100%"><canvas id="KC"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="ct">Business Development and Chain Wins Log <span style="font-size:10px;font-weight:400;color:#73726c">- filters with KPI period above</span></div>
-    <table id="WT"></table>
-  </div>
-</div>
 
-<!-- VOLUME -->
-<div id="volume" class="section">
-  <div class="fbar">
-    <div class="fbgroup">
-      <span class="fblabel">Month</span>
-      <div class="mchk-wrap" id="volMoWrap">
-        <button class="mchk-btn" id="volMoBtn" onclick="toggleDrop('volMoWrap',event)">Jan + Feb</button>
-        <div class="mchk-drop" id="volMoDrop">
-          <label class="mchk-item"><input type="checkbox" class="vol-mo" value="jan" checked onchange="volChanged()"><span>January</span></label>
-          <label class="mchk-item"><input type="checkbox" class="vol-mo" value="feb" checked onchange="volChanged()"><span>February</span></label>
-        </div>
+    <div class="cards" id="focusMetrics"></div>
+
+    <div class="layout">
+      <div class="card panel">
+        <h2>Owner Rollup</h2>
+        <div class="canvas-lg"><canvas id="focusChart"></canvas></div>
+      </div>
+      <div class="card panel">
+        <h2>Accounts Activated</h2>
+        <div class="table-wrap"><table id="focusTable"></table></div>
       </div>
     </div>
-  </div>
-  <div class="snav" id="VSN">
-    <button class="sbtn on" onclick="setVS('Big3',this)">Big 3</button>
-    <button class="sbtn" onclick="setVS('Vend',this)">Vending</button>
-    <button class="sbtn" onclick="setVS('CU',this)">C&amp;U</button>
-    <button class="sbtn" onclick="setVS('Trvl',this)">Travel</button>
-  </div>
-  <div class="mrow" id="VM"></div>
-  <div class="twoc">
-    <div class="card"><div class="ct">Volume vs PY by NCRAM</div><div class="cw3"><canvas id="VRC"></canvas></div></div>
-    <div class="card"><div class="ct">Volume vs PY by Region</div><div class="cw3"><canvas id="VRG"></canvas></div></div>
-  </div>
-  <div class="card"><div class="ct">NCRAM Volume Detail</div><table id="VDT"></table></div>
+  </section>
+
+  <div class="footer">Save this file as <strong>index.html</strong> and upload it to GitHub Pages.</div>
 </div>
 
-<!-- NCRAM RANKINGS -->
-<div id="ncram" class="section">
-  <div class="fbar">
-    <div class="fbgroup">
-      <span class="fblabel">Period</span>
-      <div class="mchk-wrap" id="rankMoWrap">
-        <button class="mchk-btn" id="rankMoBtn" onclick="toggleDrop('rankMoWrap',event)">Jan + Feb</button>
-        <div class="mchk-drop" id="rankMoDrop">
-          <label class="mchk-item"><input type="checkbox" class="rank-mo" value="jan" checked onchange="rankChanged()"><span>January</span></label>
-          <label class="mchk-item"><input type="checkbox" class="rank-mo" value="feb" checked onchange="rankChanged()"><span>February</span></label>
-          <label class="mchk-item"><input type="checkbox" class="rank-mo" value="mar" onchange="rankChanged()"><span>March</span></label>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="mrow" id="RM"></div>
-  <div class="twoc">
-    <div class="card"><div class="ct" id="nvrTitle">Volume Rankings - Feb YTD</div><table id="NVR"></table></div>
-    <div class="card"><div class="ct" id="nkrTitle">KPI Rankings - Feb YTD</div><table id="NKR"></table></div>
-  </div>
-</div>
-
-<!-- PROFILE -->
-<div id="profile" class="section">
-  <div style="margin-bottom:14px">
-    <select id="PS" onchange="renderProf()" style="font-size:13px;padding:8px 12px">
-      <option value="">-- Select an NCRAM --</option>
-      <option>Sierra Ford</option><option>Katie Naviaux</option><option>Rudy Wagner</option>
-      <option>Meg Flom</option><option>TJ McGowan</option><option>Greg Drillock</option>
-      <option>Montana Renno</option><option>Chris Trott</option><option>Carroll Jenkins</option>
-      <option>Josh Queja</option><option>Jenny Lynch</option><option>Amy Quinet</option>
-    </select>
-  </div>
-  <div id="PC"><div style="padding:48px;text-align:center;color:#888780;font-size:13px;background:#fff;border:1px solid #e8e6df;border-radius:12px">Select an NCRAM above to view their performance profile.</div></div>
-</div>
-
-<!-- FITNESS -->
-<div id="fitness" class="section">
-  <div class="whdr">
-    <div class="wico">&#127947;</div>
-    <div>
-      <div class="wttl">Focus Wave 1 - Zero Missed Workouts</div>
-      <div class="wsub">Fitness Pillar | Jan - Feb 2026 | All 5 Regions</div>
-    </div>
-    <div class="wsts">
-      <div class="wst"><div class="wv">33</div><div class="wl">Chain Wins</div></div>
-      <div class="wst"><div class="wv">305</div><div class="wl">New Reach</div></div>
-      <div class="wst"><div class="wv">116</div><div class="wl">New SKUs</div></div>
-      <div class="wst"><div class="wv">67</div><div class="wl">Equip Placed</div></div>
-      <div class="wst"><div class="wv">203</div><div class="wl">Activations</div></div>
-    </div>
-  </div>
-  <div class="snav" id="FSN">
-    <button class="sbtn fit on" onclick="setFV('all',this)">All NCRAMs</button>
-    <button class="sbtn fit" onclick="setFV('Central',this)">Central</button>
-    <button class="sbtn fit" onclick="setFV('Midwest',this)">Midwest</button>
-    <button class="sbtn fit" onclick="setFV('Northeast',this)">Northeast</button>
-    <button class="sbtn fit" onclick="setFV('Southeast',this)">Southeast</button>
-    <button class="sbtn fit" onclick="setFV('West',this)">West</button>
-  </div>
-  <div class="mrow" id="FM"></div>
-  <div class="twoc">
-    <div class="card gr"><div class="ct">New Reach by NCRAM</div><div class="cw2"><canvas id="FRC"></canvas></div></div>
-    <div class="card gr"><div class="ct">Output by Region</div><div class="cw2"><canvas id="FRG"></canvas></div></div>
-  </div>
-  <div class="twoc">
-    <div class="card gr"><div class="ct">Equipment Placed by NCRAM</div><div class="cw"><canvas id="FEC"></canvas></div></div>
-    <div class="card gr"><div class="ct">Pillar Activations by NCRAM</div><div class="cw"><canvas id="FAC"></canvas></div></div>
-  </div>
-  <div class="card gr"><div class="ct">Account-Level Detail</div><table id="FDT"></table></div>
-  <div class="card gr" style="margin-top:14px"><div class="ct">NCRAM Leaderboard - Fitness Focus Wave</div><table id="FLT"></table></div>
-</div>
-
-<!-- AT WORK FOCUS WAVE -->
-<div id="atwork" class="section">
-  <div class="awhdr">
-    <div class="awico">&#128188;</div>
-    <div>
-      <div class="awttl">Focus Wave 2 - Non-Comm Industry Games</div>
-      <div class="awsub">At Work Pillar | Apr - May 2026 | Northeast (Early Results)</div>
-    </div>
-    <div class="awsts">
-      <div class="awst"><div class="awv">2</div><div class="awl">Chain Wins</div></div>
-      <div class="awst"><div class="awv">4</div><div class="awl">New Reach</div></div>
-      <div class="awst"><div class="awv">11</div><div class="awl">New SKUs</div></div>
-      <div class="awst"><div class="awv">6</div><div class="awl">Equip Placed</div></div>
-      <div class="awst"><div class="awv">4</div><div class="awl">Activations</div></div>
-    </div>
-  </div>
-  <div class="snav" id="AWSN">
-    <button class="sbtn aw on" onclick="setAWV('all',this)">All NCRAMs</button>
-    <button class="sbtn aw" onclick="setAWV('Central',this)">Central</button>
-    <button class="sbtn aw" onclick="setAWV('Midwest',this)">Midwest</button>
-    <button class="sbtn aw" onclick="setAWV('Northeast',this)">Northeast</button>
-    <button class="sbtn aw" onclick="setAWV('Southeast',this)">Southeast</button>
-    <button class="sbtn aw" onclick="setAWV('West',this)">West</button>
-  </div>
-  <div class="mrow" id="AWM"></div>
-  <div class="card aw"><div class="ct">Account-Level Detail</div><table id="AWDT"></table></div>
-  <div class="card aw" style="margin-top:14px"><div class="ct">NCRAM Leaderboard - At Work Focus Wave</div><table id="AWLT"></table></div>
-</div>
-
-<!-- INSIGHTS -->
-<div id="insights" class="section">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <div>
-      <div style="font-size:16px;font-weight:600;color:#1a1a18">AI Insights</div>
-      <div style="font-size:12px;color:#73726c;margin-top:2px">Data-driven insights from your team performance - select a focus area then click Generate</div>
-    </div>
-    <button class="ibtn" id="genBtn" onclick="generateInsights()">Generate Insights</button>
-  </div>
-  <div class="isel" id="isel">
-    <button class="isel-btn on" onclick="setIF('overall',this)">Overall Performance</button>
-    <button class="isel-btn" onclick="setIF('volume',this)">Volume Trends</button>
-    <button class="isel-btn" onclick="setIF('kpi',this)">KPI Activity</button>
-    <button class="isel-btn" onclick="setIF('fitness',this)">Fitness Focus Wave</button>
-    <button class="isel-btn" onclick="setIF('risk',this)">Risks and Opportunities</button>
-  </div>
-  <div id="iOut">
-    <div style="padding:48px;text-align:center;color:#888780;font-size:13px;background:#fff;border:1px solid #e8e6df;border-radius:12px">
-      <div style="font-size:32px;margin-bottom:12px">&#128161;</div>
-      <div style="font-weight:500;color:#1a1a18;margin-bottom:6px">Ready to generate insights</div>
-      <div>Select a focus area above and click Generate Insights.</div>
-    </div>
-  </div>
-  <div class="anote">&#128161; Insights are generated from your live dashboard data. Click Generate Insights to load. Select a focus area to view different perspectives.</div>
-</div>
-
-</div>
 <script>
-var RAMS = [
-  {n:'Sierra Ford',   reg:'Central',   ini:'SF', c:'#378ADD'},
-  {n:'Katie Naviaux', reg:'Central',   ini:'KN', c:'#185FA5'},
-  {n:'Rudy Wagner',   reg:'Midwest',   ini:'RW', c:'#1D9E75'},
-  {n:'Meg Flom',      reg:'Midwest',   ini:'MF', c:'#0F6E56'},
-  {n:'TJ McGowan',    reg:'Midwest',   ini:'TM', c:'#085041'},
-  {n:'Greg Drillock', reg:'Northeast', ini:'GD', c:'#EF9F27'},
-  {n:'Montana Renno', reg:'Northeast', ini:'MR', c:'#BA7517'},
-  {n:'Chris Trott',   reg:'Northeast', ini:'CT', c:'#854F0B'},
-  {n:'Carroll Jenkins',reg:'Southeast',ini:'CJ', c:'#E24B4A'},
-  {n:'Josh Queja',    reg:'Southeast', ini:'JQ', c:'#A32D2D'},
-  {n:'Jenny Lynch',   reg:'West',      ini:'JL', c:'#7F77DD'},
-  {n:'Amy Quinet',    reg:'West',      ini:'AQ', c:'#534AB7'}
-];
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const scoreRaw = `
+period|region|name|rank|bd|chain|reach|equip|pipeline|vending|score|trend
+Jan–Feb 2026|Central|Sierra Ford|1|3|1|53|57|11|668|42|new
+Jan–Feb 2026|West|Amy Quinet|2|2|2|19|11|6|1958|49|new
+Jan–Feb 2026|West|Jenny Lynch|3|2|2|49|8|5|2193|51|new
+Jan–Feb 2026|Northeast|Chris Trott|4|3|1|15|10|5|3124|52|new
+Jan–Feb 2026|Central|Katie Naviaux|5|0|2|81|13|3|1755|54|new
+Jan–Feb 2026|Midwest|TJ McGowan|6|3|2|40|1|5|961|55|new
+Jan–Feb 2026|Southeast|Josh Queja|7|1|3|15|4|2|2594|65|new
+Jan–Feb 2026|Northeast|Greg Drillock|8|3|0|70|4|5|800|66|new
+Jan–Feb 2026|Midwest|Rudy Wagner|9|5|0|11|17|3|1681|70|new
+Jan–Feb 2026|Midwest|Meg Flom|10|1|1|14|21|1|2521|73|new
+Jan–Feb 2026|Northeast|Montana Renno|11|3|0|6|9|4|475|86|new
+Jan–Feb 2026|Southeast|Carroll Jenkins|12|1|0|2|3|2|960|110|new
+Mar 2026|Northeast|Chris Trott|1|2|4|66|16|11|4|31|up
+Mar 2026|Central|Katie Naviaux|2|8|0|2|27|8|15|34|up
+Mar 2026|Midwest|Meg Flom|3|4|1|6|4|4|211|49|up
+Mar 2026|Central|Sierra Ford|4|2|0|13|14|4|0|50|down
+Mar 2026|West|Amy Quinet|5|6|0|2|5|6|0|51|down
+Mar 2026|Southeast|Josh Queja|6|4|0|0|36|4|0|54|up
+Mar 2026|West|Jenny Lynch|7|3|0|2|19|3|0|56|down
+Mar 2026|Northeast|Greg Drillock|8|1|1|11|9|2|0|59|up
+Mar 2026|Southeast|Carroll Jenkins|9|5|0|2|3|5|0|61|up
+Mar 2026|Midwest|Rudy Wagner|10|2|0|9|2|4|0|68|up
+Mar 2026|Midwest|TJ McGowan|11|0|0|0|8|6|0|79|down
+Mar 2026|Northeast|Montana Renno|12|1|0|1|4|2|0|85|up
+`;
 
-var RC = {Central:'#378ADD',Midwest:'#1D9E75',Northeast:'#EF9F27',Southeast:'#E24B4A',West:'#7F77DD'};
-var REGS = ['Central','Midwest','Northeast','Southeast','West'];
+    const winsRaw = `
+period|owner|type|segment|account|locations|volumeImpact
+Jan–Feb 2026|Amy Quinet|Bus. Development Win|Vending|Canteen / SFSU|13|1000
+Jan–Feb 2026|Amy Quinet|Bus. Development Win|Vending|Canteen / Google|1|2000
+Jan–Feb 2026|Amy Quinet|Chain Win|Fitness|In Shape Fitness|42|2500
+Jan–Feb 2026|Carroll Jenkins|Bus. Development Win|C&U|Valencia College|1|2000
+Jan–Feb 2026|Chris Trott|Bus. Development Win|Vending|Buffalo Strive / Vistar|10|3200
+Jan–Feb 2026|Chris Trott|Chain Win|Fitness|Central Rock Gym|2|6700
+Jan–Feb 2026|Greg Drillock|Bus. Development Win|Travel|Villa Restaurant Group|70|1800
+Jan–Feb 2026|Jenny Lynch|Chain Win|Fitness|Mountainside Fitness|22|5000
+Jan–Feb 2026|Jenny Lynch|Chain Win|Travel|Crews of California|27|5000
+Jan–Feb 2026|Josh Queja|Bus. Development Win|Healthcare|Baptist Hospital|2|2800
+Jan–Feb 2026|Katie Naviaux|Chain Win|Fitness|Vasa Fitness|72|2500
+Jan–Feb 2026|Meg Flom|Chain Win|Fitness|Powerhouse Gym|14|1000
+Jan–Feb 2026|Montana Renno|Bus. Development Win|Vending|Canteen Roanoke|1|5000
+Jan–Feb 2026|Rudy Wagner|Bus. Development Win|Healthcare|SSM Healthcare|5|1000
+Jan–Feb 2026|Sierra Ford|Bus. Development Win|Travel|Star Concessions|8|2500
+Jan–Feb 2026|Sierra Ford|Chain Win|Fitness|Tru Fit|40|1500
+Jan–Feb 2026|TJ McGowan|Chain Win|Fitness|FFC|10|800
+Mar 2026|Sierra Ford|Bus. Development Win|Travel|Star Concessions|11|3360
+Mar 2026|Amy Quinet|Bus. Development Win|Foodservice - At Work|Google|40|576
+Mar 2026|Meg Flom|Bus. Development Win|Foodservice - At Work|Honda|1|500
+Mar 2026|Meg Flom|Chain Win|Fitness|Indiana Fitness Clubs|4|225
+Mar 2026|Jenny Lynch|Bus. Development Win|Travel|LAX / Crews of California|9|5000
+Mar 2026|Katie Naviaux|Bus. Development Win|Vending|Canteen Denver|1|3000
+Mar 2026|Chris Trott|Chain Win|Foodservice - At Work|State Street Financial|2|3200
+Mar 2026|Chris Trott|Chain Win|Fitness|Planet Fitness|60|600
+Mar 2026|Josh Queja|Bus. Development Win|Vending|Pee Dee Vending|36|2000
+Mar 2026|Carroll Jenkins|Bus. Development Win|Fitness|CR Fitness|92|2500
+Mar 2026|Greg Drillock|Business Development|Vending|Bevco Vending|100|700
+Mar 2026|Montana Renno|Business Development|Healthcare|University Hospital|1|300
+`;
 
-var SEGMAP = {Big3:'Big 3',Vend:'Vending',CU:'C and U',Trvl:'Travel'};
-var SEGCOL = {Big3:'#378ADD',Vend:'#1D9E75',CU:'#EF9F27',Trvl:'#7F77DD'};
-
-
-
-// ============================================================
-// DATA LOADER (Power BI / GitHub Pages)
-// ============================================================
-let KPI = {};
-let VOL = [];
-let WINS = [];
-let FIT = [];
-let ATWORK = [];
-let META = {};
-
-fetch('./data.json')
-  .then(res => {
-    if (!res.ok) throw new Error('Failed to load data.json');
-    return res.json();
-  })
-  .then(data => {
-    KPI = data.KPI;
-    VOL = data.VOL;
-    WINS = data.WINS;
-    FIT = data.FIT;
-    ATWORK = data.ATWORK;
-    META = data.meta || {};
-
-    renderNat(); // boot app after data loads
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Dashboard data failed to load.');
-  });
-
+    const regionVolRaw = `
+month|region|segment|actYTD|bp|pyYTD|reachYTD|reachPY|goal
+January|Central|Big 3|8283.419|8933.152045|7767.9583|507|479|0.15
+January|Central|Vending|33260|30028.8|26112|209|186|0.15
+January|Central|Travel|1755|2055.05|1787|null|null|0.12
+January|Central|C&U|6567|6527.4|5676|225|224|0.10
+January|Midwest|Big 3|6650.8433|8155.141395|7091.4273|567|581|0.15
+January|Midwest|Vending|58244|50169.9|43626|354|332|0.15
+January|Midwest|Travel|627|1209.8|1052|null|null|0.12
+January|Midwest|C&U|4909|4826.55|4197|262|234|0.10
+January|Northeast|Big 3|8594.5073|10645.933295|9257.3333|962|927|0.15
+January|Northeast|Vending|54971|51265.85|44579|296|271|0.15
+January|Northeast|Travel|1799|2258.6|1964|null|null|0.12
+January|Northeast|C&U|3951|4374.6|3804|260|244|0.10
+January|Southeast|Big 3|6878.455|6685.33295|5813.333|534|481|0.15
+January|Southeast|Vending|54239|50601.15|44001|321|282|0.15
+January|Southeast|Travel|2737|3838.7|3338|null|null|0.12
+January|Southeast|C&U|4282|5026.65|4371|210|207|0.10
+January|West|Big 3|9294.3333|10371.275|9018.5|631|584|0.15
+January|West|Vending|53411|55070.05|47887|221|211|0.15
+January|West|Travel|3744|3206.2|2788|null|null|0.12
+January|West|C&U|9198|7933.85|6899|243|228|0.10
+February|Central|Big 3|16405|17126.95|14893|533|521|0.15
+February|Central|Vending|78245|71316.1|62014|242|219|0.15
+February|Central|Travel|3414|3701.6|3305|null|null|0.12
